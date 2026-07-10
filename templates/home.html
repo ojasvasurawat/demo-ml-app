@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Height Prediction App</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4facfe, #00c6fb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            width: 500px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 6px;
+            background: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #007BFF;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        #error {
+            color: red;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Height Prediction</h2>
+
+    <p>Enter weights(kg) separated by commas</p>
+
+    <textarea id="weights" placeholder="Example: 50,55,12,70"></textarea>
+
+    <button onclick="predict()">Predict Heights</button>
+
+    <div id="error"></div>
+    <div id="result"></div>
+</div>
+
+<script>
+async function predict() {
+
+    document.getElementById("error").innerHTML = "";
+    document.getElementById("result").innerHTML = "";
+
+    const weights = document.getElementById("weights").value
+        .split(",")
+        .map(x => Number(x.trim()))
+        .filter(x => !isNaN(x));
+
+    if (weights.length === 0) {
+        document.getElementById("error").innerHTML = "Please enter valid weights.";
+        return;
+    }
+
+    try {
+        const response = await fetch("/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                weight: weights
+            })
+        });
+
+        const data = await response.json();
+
+        let table = `
+            <table>
+                <tr>
+                    <th>Weight (kg)</th>
+                    <th>Predicted Height (cm)</th>
+                </tr>
+        `;
+
+        for (let i = 0; i < data.weight.length; i++) {
+            table += `
+                <tr>
+                    <td>${data.weight[i]}</td>
+                    <td>${data.predicted_height[i][0].toFixed(2)}</td>
+                </tr>
+            `;
+        }
+
+        table += "</table>";
+
+        document.getElementById("result").innerHTML = table;
+
+    } catch (err) {
+        document.getElementById("error").innerHTML =
+            "Error communicating with the server.";
+    }
+}
+</script>
+
+</body>
+</html>

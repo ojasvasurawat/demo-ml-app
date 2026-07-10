@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pickle
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ with open('scaler.pkl', 'rb') as f:
 
 @app.route('/')
 def home():
-    return "Height Predicter Api"
+    return render_template('home.html')
 
 @app.route('/predict', methods=["POST"])
 def predict():
