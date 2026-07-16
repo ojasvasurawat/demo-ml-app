@@ -1,0 +1,19 @@
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  execute-script:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Clone the repository onto the GitHub runner
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Step 2: Make the script executable and run it
+      - name: Run my shell script
+        run: |
+          chmod +x ./script.sh
+          ./script.sh
+        shell: bash
