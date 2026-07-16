@@ -26,7 +26,7 @@ def predict():
     scaled_weight = scaler.transform(pd.DataFrame(wt))
     # scaled_weight = scaler.transform(pd.DataFrame([[weight]])) #when weight is a single value not list/array
     prediction = model.predict(scaled_weight)
-    prediction = list(np.array(prediction) + 20)
+    prediction = np.array(prediction) + 20
 
     return jsonify({
         "weight": weight,
